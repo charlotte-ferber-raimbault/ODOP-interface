@@ -85,12 +85,20 @@ void loop() {
 
     // Report status
     if (readString.startsWith("status")) {
-      Serial.print("Current position (steps): ");
-      Serial.println(stepperX.currentPosition());
-      Serial.print("Current position (degrees): ");
-      float curPosSteps=(float)stepperX.currentPosition();
+      Serial.print("Current position moteur poulie (steps): ");
+      Serial.println(stepper_p.currentPosition());
+      Serial.print("Current position moteur poulie (degrees): ");
+      float curPosSteps=(float)stepper_p.currentPosition();
       float curPosDeg=curPosSteps/ANGLE_RANGE;
       Serial.println(curPosDeg);
+
+      Serial.print("Current position moteur courroie (steps): ");
+      Serial.println(stepper_c.currentPosition());
+      Serial.print("Current position moteur courroie (degrees): ");
+      float curPosSteps=(float)stepper_c.currentPosition();
+      float curPosDeg=curPosSteps/ANGLE_RANGE;
+      Serial.println(curPosDeg);
+
       Serial.println("Status ok");
     }
 
