@@ -8,7 +8,7 @@ from preferences import *
 class Controller:
 
     def __init__ (self, baud_rate: int = BAUD_RATE, port = PORT, ready_msg = READY_MSG, time_init_max = TIME_INIT_MAX):
-        self.controller = serial.Serial(port=PORT, baudrate=BAUD_RATE, timeout=.1)
+        self.controller = serial.Serial(port=port, baudrate=baud_rate, timeout=.1)
         self.ready_msg = ready_msg
         self.__ready = False
         self.time_init = time.time()
@@ -49,6 +49,7 @@ class Controller:
         self.controller .write(bytes(command, 'utf-8'))
         time.sleep(0.05)
 
+    #à modifier, sûrement simplifier
         # Process readback
         time_start = time.time()  # in seconds
         if DEBUG_VERBOSE: print(f'{int(time_start)} - waiting till {int(time_start + time_window)} ({time_window} seconds)')
@@ -69,32 +70,13 @@ class Controller:
         else: return 0  # True if readback unspecified
 
 
-    def read (self, time_window: float = 2.) -> list:
-        """
-        Read serial output
-        :param time_window: timeout
-        :return: output
-        """
-        buffer = list()
-
-        time_start = time.time()  # in seconds
-        while time.time() < time_start + time_window:
-            data = self.controller .readline()
-            if data:
-                data_decoded = data.decode('utf-8')[:-2]
-                buffer.append(data_decoded)
-
-        if STATUS_VERBOSE: print(buffer)
-        return buffer
-
-
 class ODOP (Controller):
 
     def __init__ (self, baud_rate: int = BAUD_RATE, port = PORT, ready_msg = READY_MSG, time_init_max = TIME_INIT_MAX):
         super(ODOP, self).__init__ (baud_rate, port, ready_msg, time_init_max)
         self.__angles = {'x': 0., 'y': 0.}
 
-    def get_version (self):
+    '''def get_version (self):
         self.execute (command='version')
 
     def get_status (self) -> tuple:
@@ -104,7 +86,7 @@ class ODOP (Controller):
 
     def get_angle (self, axis: str) -> float:
         if axis not in ('x', 'y'): return None
-        return self.__angles [axis]
+        return self.__angles [axis]'''
     
     def set_angle (self, axis: str, val: float):
         """
@@ -116,7 +98,7 @@ class ODOP (Controller):
         self.__angles [axis] = val
 
 
-    # Calibration
+    '''# Calibration
     def estimate_zero (self) -> tuple:
         """
         Move to minimum position and then back up to +25
@@ -160,10 +142,10 @@ class ODOP (Controller):
 
             # Execute command
             try: self.move_relative(axis, float(command))
-            except ValueError: continue
+            except ValueError: continue'''
 
 
-    def set_zero (self) -> bool:
+    '''def set_zero (self) -> bool:
         val = self.execute (command='set_zero', time_window=2., readback='set_zero: success')
         return val == 0
 
@@ -177,11 +159,11 @@ class ODOP (Controller):
         if not success: raise InterruptedError(f'estimate_zero failure - {msg}')
         success, msg = self.adjust_position('x')
         if not success: raise InterruptedError(f'manual calibration failure - {msg}')
-        self.set_zero()
+        self.set_zero()'''
 
 
     # Motion
-    def move_relative (self, axis: str, value: float) -> tuple:
+    def move_relative_p (self, value: float) -> tuple:
         """
         Execute relative angular position command of specified axis
         :param axis: axis
@@ -189,28 +171,54 @@ class ODOP (Controller):
         :return: success_bool, success_msg
         """
 
-        # Assert arguments
-        axis = axis.lower()
-        if axis not in ('x', 'y'): return False
+        if value >= X_ANGLE_MIN and value <= X_ANGLE_MAX:
+            
+            # Log movement
+            self.set_angle('x', value)
 
-        # Log movement
-        self.__angles [axis] += value
+            # Execute command
+            val = self.execute (
+                command=f'rotate_p {float(value)}',
+                time_window=min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX),  # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
+                readback=f'rotate_p : success',
+                fatal=f'rotate_p : limit reached'
+            )
 
-        # Execute command
-        val = self.execute (
-            command=f'move_rel {axis} {float(value)}',
-            time_window=min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX),  # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
-            readback=f'move_rel {axis}: success',
-            fatal=f'move_rel {axis}: limit reached'
-        )
+            # Process output
+            if   val == 0: return True, ''
+            elif val == 2: return False, 'limit reached'
+            else:          return False, 'timeout'
+        else:
+            print('Value out of axis range.')
 
-        # Process output
-        if   val == 0: return True, ''
-        elif val == 2: return False, 'limit reached'
-        else:          return False, 'timeout'
+    def move_relative_c (self, value: float) -> tuple:
+        """
+        Execute relative angular position command of specified axis
+        :param axis: axis
+        :param value: angular displacement
+        :return: success_bool, success_msg
+        """
+        if value >= Y_ANGLE_MIN and value <= Y_ANGLE_MAX:
+            # Log movement
+            self.set_angle('y', value)
+
+            # Execute command
+            val = self.execute (
+                command=f'rotate_c {float(value)}',
+                time_window=min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX),  # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
+                readback=f'rotate_c : success',
+                fatal=f'rotate_c : limit reached'
+            )
+
+            # Process output
+            if   val == 0: return True, ''
+            elif val == 2: return False, 'limit reached'
+            else:          return False, 'timeout'
+        else:
+            print('Value out of axis range.')
 
 
-    def move_absolute (self, axis: str, value: float) -> tuple:
+    def move_absolute_p (self, value: float) -> tuple:
         """
         Execute absolute angular position command of specified axis
         :param axis: axis
@@ -218,22 +226,24 @@ class ODOP (Controller):
         :return: success_bool, success_msg
         """
 
-        # Assert arguments
-        axis = axis.lower()
-        if axis not in ('x', 'y'): return False
+        # Start by going to 0
+        self.move_relative_p (0.)
 
-        # Log movement
-        self.__angles [axis] = value
+        # Then, go to the command
+        self.move_relative_p (value)
 
-        # Execute command
-        val = self.execute (
-            command=f'move_abs {axis} {float(value)}',
-            time_window=TIME_WINDOW_MAX,
-            readback=f'move_abs {axis}: success',
-            fatal=f'move_abs {axis}: limit reached'
-        )
+    
+    def move_absolute_c (self, value: float) -> tuple:
+        """
+        Execute absolute angular position command of specified axis
+        :param axis: axis
+        :param value: angular position
+        :return: success_bool, success_msg
+        """
 
-        # Process output
-        if   val == 0: return True, ''
-        elif val == 2: return False, 'limit reached'
-        else:          return False, 'timeout'
+        # Start by going to 0
+        self.move_relative_c (0.)
+
+        # Then, go to the command
+        self.move_relative_c (value)
+        

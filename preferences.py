@@ -1,12 +1,20 @@
+# Program settings
+#à comprendre
+SESSION_PATH = "c:\\tmp\\"
+FILENAME_TEMPLATE = "odop-vI{}-vA{}-hI{}-hA{}.jpg"
+
 # Serial settings
 PORT = '/dev/cu.usbmodem101'  # 'COM5'
 BAUD_RATE = 9600
 READY_MSG = 'Controller ready'  # Program waits for this message
 
-# X-axis angular range (total range is divided by number of vertical shots)
-#nécessaire ?
-X_ANGLE_MIN = -15.
-X_ANGLE_MAX = 90.
+# X-axis angular range, in degrees
+X_ANGLE_MIN = 0.
+X_ANGLE_MAX = 360.
+
+# Y-axis angular range, in degrees
+Y_ANGLE_MIN = 0.
+Y_ANGLE_MAX = 90.
 
 # Delays
 TIME_INIT_MAX = 60.  # Maximum initialisation time for ODOP (in seconds)
@@ -20,3 +28,5 @@ DELAY_AFTER_SHOT = 1.5
 DEBUG_VERBOSE = False
 STATUS_VERBOSE = True
 RUN_MESSAGE = 'Make sure to remove all calibration wires before starting run.'
+
+nb_samples = 100 #Number of photos taken
