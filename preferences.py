@@ -29,4 +29,6 @@ DEBUG_VERBOSE = False
 STATUS_VERBOSE = True
 RUN_MESSAGE = 'Make sure to remove all calibration wires before starting run.'
 
-nb_samples = 100 #Number of photos taken
+nb_samples = 100 # Number of photos taken
+
+steps_per_rev = 200*32/360 # Number of steps per revolution 

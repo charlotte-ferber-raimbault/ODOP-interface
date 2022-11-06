@@ -34,14 +34,13 @@ class Controller:
     def ready (self):
         return self.__ready
 
-    def execute (self, command: str, time_window: float = 2., readback: str = '', fatal: str = '') -> int:
+    def execute (self, command: str, time_window: float = 2., readback: str = '') -> int:
         """
-        Execute command and check for readback message and fatal message
+        Execute command and check for readback message
         :param command: command
         :param time_window: time window to receive readback (in seconds)
         :param readback: readback message
-        :param fatal: fatal message
-        :return: status value (0=success, 1=timeout, 2=fatal)
+        :return: status value (0=success, 1=timeout)
         """
 
         # Send command
@@ -63,8 +62,6 @@ class Controller:
 
                 if readback and data_decoded == readback:  # Exit loop with success
                     return 0
-                if fatal and data_decoded == fatal:  # Exit loop with failure
-                    return 2
 
         if readback: return 1
         else: return 0  # True if readback unspecified
@@ -109,8 +106,7 @@ class ODOP (Controller):
         val = self.execute (
             command=f'move_rel x -200',
             time_window=TIME_WINDOW_MAX,
-            readback='move_rel x: limit reached',
-            fatal='move_rel x: success'
+            readback='move_rel x: limit reached'
         )
         if val != 0: return False, 'unable to reach minimum'  # Exit if didn't find end stop
 
@@ -178,16 +174,18 @@ class ODOP (Controller):
 
             # Execute command
             val = self.execute (
-                command=f'rotate_p {float(value)}',
+                command=f'rotate_p {float(value)}', #il faut convertir value en nombre de pas
                 time_window=min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX),  # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
-                readback=f'rotate_p : success',
-                fatal=f'rotate_p : limit reached'
+                readback=f'rotate_p : success'
             )
-
+            
             # Process output
-            if   val == 0: return True, ''
-            elif val == 2: return False, 'limit reached'
-            else:          return False, 'timeout'
+            if   val == 0:
+                # Inform user
+                print('Successfully moved')
+                return True, ''
+            else:          
+                return False, 'timeout'
         else:
             print('Value out of axis range.')
 
@@ -204,16 +202,18 @@ class ODOP (Controller):
 
             # Execute command
             val = self.execute (
-                command=f'rotate_c {float(value)}',
+                command=f'rotate_c {float(value)}', #il faut convertir value en degrés du moteur puis en nombre de pas
                 time_window=min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX),  # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
-                readback=f'rotate_c : success',
-                fatal=f'rotate_c : limit reached'
+                readback=f'rotate_c : success'
             )
 
             # Process output
-            if   val == 0: return True, ''
-            elif val == 2: return False, 'limit reached'
-            else:          return False, 'timeout'
+            if   val == 0:
+                # Inform user
+                print('Successfully moved')
+                return True, ''
+            else:          
+                return False, 'timeout'
         else:
             print('Value out of axis range.')
 
@@ -227,10 +227,10 @@ class ODOP (Controller):
         """
 
         # Start by going to 0
-        self.move_relative_p (0.)
+        self.move_relative_p(-self.get_angle('x'))
 
         # Then, go to the command
-        self.move_relative_p (value)
+        self.move_relative_p(value)
 
     
     def move_absolute_c (self, value: float) -> tuple:
@@ -242,8 +242,29 @@ class ODOP (Controller):
         """
 
         # Start by going to 0
-        self.move_relative_c (0.)
+        self.move_relative_c(-self.get_angle('y'))
 
         # Then, go to the command
-        self.move_relative_c (value)
+        self.move_relative_c(value)
         
+    # Taking pictures
+    def take_picture(self):
+        """
+        Execute taking picture command
+        :return: success_bool, success_msg
+        """
+        # Execute command
+        val = self.execute (
+            command=f'take_picture',
+            time_window=min(max(abs(2), TIME_WINDOW_MIN), TIME_WINDOW_MAX), #à modifier # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
+            readback=f'take_picture : success'
+        )
+
+        # Process output
+        if   val == 0:
+            # Inform user
+            print('Picture taken')
+            return True, ''
+        else:          
+            return False, 'timeout'
+

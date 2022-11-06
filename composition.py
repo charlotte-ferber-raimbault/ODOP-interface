@@ -11,55 +11,68 @@ class Composition:
     def __init__ (self, odop: ODOP, nb_samples: int = nb_samples):
         self.odop = odop
         self.nb_samples = nb_samples
-        
 
-    def run (self) -> tuple:
+    def go_to (self, x_angle : float, y_angle : float) -> tuple:
         """
-        Run composition
+        Goes to a position
+        :param x_angle: position of the pivot
+        :param y_angle: position of the belt
         :return: success_bool, success_msg
         """
 
         if STATUS_VERBOSE: print('\nStarting run')
 
-        X, Y, Z = fibonacci_sphere(nb_samples)
-
-        #à modifier en fonction de la forme de X et Y
-        #ne fontionnne pas pour les 1er i et j
-        for i in range (len(Y)):
-            self.odop.move_relative_c(Y[i] - Y[i - 1])
-            for j in range (len(X)):
-                self.odop.move_relative_p(X[j] - X[j - 1])
-                #take picture
-            self.odop.move_relative_p(-self.odop.get_angle('x'))
-
-        '''for vertical_shot_id in range (self.vertical_shots_nb + 1):
-            if STATUS_VERBOSE: print(f'\tCurrent vAngle is {self.odop.get_angle("x")}')
-
-            # Reset Y-axis angle (controller-side reset deactivated because superfluous)
-            if STATUS_VERBOSE: print('\tResetting hAngle. Was {}'.format(self.odop.get_angle('y')))
-            self.odop .set_angle ('y', 0.)
-            #success, val = self.odop .execute (command='move_abs y 0', time_window=60., readback='move_abs y: success')
-            #if not success: return False, val
-
-            # Run through horizontal steps (turntable rotation)
-            for horizontal_shot_id in range (self.horizontal_shots_nb):
-                if STATUS_VERBOSE: print(f'\t\tCurrent hAngle is {self.odop.get_angle("y")}')
-
-                # Build file name
-                filepath = SESSION_PATH + FILENAME_TEMPLATE .format(vertical_shot_id, self.odop.get_angle('x'), horizontal_shot_id, self.odop.get_angle('y'))
-                if STATUS_VERBOSE: print(f'\t\tRequesting shot: {filepath}')
-
-                # Take shot
-                time.sleep(DELAY_BEFORE_SHOT)
-                self.camera .capture(filepath=filepath)
-                time.sleep(DELAY_AFTER_SHOT)
-
-                # Move on Y-axis (turntable)
-                self.odop .move_relative ('y', self.y_step_deg)
-
-            # Move on X-axis (swing)
-            success, val = self.odop .move_relative ('x', self.x_step_deg)
-            if not success: return False, val'''
+        self.odop.move_absolute_c(y_angle)
+        self.odop.move_absolute_p(x_angle)
 
         if STATUS_VERBOSE: print('Run success\n')
         return True, ''
+
+    def group_pictures (self, list: list) -> tuple:
+        """
+        Run group pictures
+        :param list: list pf the positions
+        :return: success_bool, success_msg
+        """
+
+        if STATUS_VERBOSE: print('\nStarting run')    
+
+        for i in range(1, len(list)):            
+            self.odop.move_absolute_c(list[i][1])
+            self.odop.move_relative_p(list[i][0])
+            self.odop.take_picture()
+
+        if STATUS_VERBOSE: print('Run success\n')
+        return True, ''
+
+    def automatic_pictures (self, nb_samples: int = nb_samples) -> tuple:
+        """
+        Run automatic pictures
+        :param nb_samples: number of pictures
+        :return: success_bool, success_msg
+        """
+
+        if STATUS_VERBOSE: print('\nStarting run')
+
+        M = maillage(nb_samples)
+
+        # To start at the position (0, 0)
+        if self.odop.get_angle('x') != 0:
+            self.odop.move_absolute_p(0.)
+        if self.odop.get_angle('y') != 0:
+            self.odop.move_absolute_c(0.)
+        
+        # For the position (0, 0)
+        self.odop.take_picture()
+
+        y_angle = 0
+
+        # For the rest
+        for i in range(1, len(M)):            
+            self.odop.move_relative_c(M[i][0] - M[i - 1][0])
+            self.odop.move_relative_p(M[i][1] - M[i - 1][1])
+            self.odop.take_picture()
+            if M[i][0] != y_angle:
+                self.odop.move_relative_p(-self.odop.get_angle('x')) # the pivot does one revolution as a maximum
+                y_angle = M[i][0]
+        
