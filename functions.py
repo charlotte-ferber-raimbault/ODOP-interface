@@ -18,9 +18,9 @@ def type_input (message: str, type_, max_iter: int = 10):
             val = type_(val)
             return val
         except:
-            print('invalid input')
+            print('Invalid input')
 
         iter_nb += 1
 
         if iter_nb > max_iter:
-            raise InterruptedError('invalid input')
+            raise InterruptedError('Invalid input')

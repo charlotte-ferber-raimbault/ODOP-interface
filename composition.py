@@ -8,12 +8,10 @@ from maillage import *
 
 class Composition:
 
-    def __init__ (self, odop: ODOP, nb_samples: int = nb_samples, vertical_angle_min: float = X_ANGLE_MIN, vertical_angle_max: float = X_ANGLE_MAX):
+    def __init__ (self, odop: ODOP, nb_samples: int = nb_samples):
         self.odop = odop
         self.nb_samples = nb_samples
-        self.vertical_angle_min = vertical_angle_min
-        self.vertical_angle_max = vertical_angle_max
-
+        
 
     def run (self) -> tuple:
         """
@@ -23,18 +21,18 @@ class Composition:
 
         if STATUS_VERBOSE: print('\nStarting run')
 
-        # Move swing to lowest position
-        '''success, val = self.odop .move_absolute ('x', self.vertical_angle_min)
-        if not success: return False, val'''
-
         X, Y, Z = fibonacci_sphere(nb_samples)
 
-        # Run through vertical steps (swing rotation)
-        for y in Y:
-            self.odop.set_angle('y')
-            for x in X:
-                self.odop.set_angle('x')
-        for vertical_shot_id in range (self.vertical_shots_nb + 1):
+        #à modifier en fonction de la forme de X et Y
+        #ne fontionnne pas pour les 1er i et j
+        for i in range (len(Y)):
+            self.odop.move_relative_c(Y[i] - Y[i - 1])
+            for j in range (len(X)):
+                self.odop.move_relative_p(X[j] - X[j - 1])
+                #take picture
+            self.odop.move_relative_p(-self.odop.get_angle('x'))
+
+        '''for vertical_shot_id in range (self.vertical_shots_nb + 1):
             if STATUS_VERBOSE: print(f'\tCurrent vAngle is {self.odop.get_angle("x")}')
 
             # Reset Y-axis angle (controller-side reset deactivated because superfluous)
@@ -61,7 +59,7 @@ class Composition:
 
             # Move on X-axis (swing)
             success, val = self.odop .move_relative ('x', self.x_step_deg)
-            if not success: return False, val
+            if not success: return False, val'''
 
         if STATUS_VERBOSE: print('Run success\n')
         return True, ''

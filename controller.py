@@ -83,10 +83,10 @@ class ODOP (Controller):
         val = self.execute (command='status', time_window=2., readback='Status ok')
         if val == 0: return True, ''
         else: return False, 'unable to verify status'
-
+'''
     def get_angle (self, axis: str) -> float:
         if axis not in ('x', 'y'): return None
-        return self.__angles [axis]'''
+        return self.__angles [axis]
     
     def set_angle (self, axis: str, val: float):
         """
