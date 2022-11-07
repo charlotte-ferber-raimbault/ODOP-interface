@@ -1,4 +1,5 @@
 import time
+import csv
 
 from controller import ODOP
 from composition import Composition
@@ -39,15 +40,18 @@ if __name__ == '__main__':
         
         if mode == 'go_to':
             pivot_position = type_input('Enter the angle of the pivot\n>', float)
-            courroie_position = type_input('Enter the angle of the belt\n>', float)
+            belt_position = type_input('Enter the angle of the belt\n>', float)
 
             # Run composer
-            success, msg = composition.go_to()
+            success, msg = composition.go_to(pivot_position, belt_position)
             if not success: raise InterruptedError(f'run failure - {msg}')
             
             mode = type_input('Do you want to take a picture ? y for yes, n for no\n>', str)
             if mode == 'y':
                 odop.take_picture()
+            
+            composition.go_to(0., 0.)
+
 
         elif mode == 'group_pictures':
             positions = type_input('Enter the desired positions, as a list with the format [pivot angle, belt angle]\n>', list)
@@ -56,7 +60,7 @@ if __name__ == '__main__':
 
         elif mode == 'automatic_pictures':
             nb_pictures = type_input('Enter the numbre of pictures\n>', int)
-            success, msg = composition.automatic_pictures(positions)
+            success, msg = composition.automatic_pictures(nb_pictures)
             if not success: raise InterruptedError(f'run failure - {msg}')
             '''
             #à modifier

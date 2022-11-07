@@ -50,23 +50,6 @@ void loop() {
 
   if (readString.length() >0) {
 
-    // Motion command in steps for moteur pivot
-    if (readString.startsWith("move_p ")) {
-      long a =readString.substring(5).toInt();
-      setRunningSpeed_p();
-      rotateTo_p(a);
-      Serial.println("move_p ok");
-    }
-
-    // Motion commande for moteur courroie
-    if (readString.startsWith("move_c ")) {
-      long a =readString.substring(5).toInt();
-      setRunningSpeed_c();
-      rotateTo_p(a);
-      Serial.println("move_p ok");
-    }
-
-
     // Relative motion command in steps for moteur pivot
     if (readString.startsWith("rotate_p ")) {
       long a =readString.substring(6).toInt();
@@ -104,26 +87,6 @@ void loop() {
 
     readString="";
   }
-}
-
-// Actual rotation function, in steps, absolute for moteur pivot
-void rotateTo_p(long _angle)
-{
-  stepper_p.moveTo(_angle);
-  while (stepper_p.run()) {
-    //No op
-  }
-  setRunningSpeed_p();
-}
-
-// Actual rotation function, in steps, absolute for moteur pivot
-void rotateTo_c(long _angle)
-{
-  stepper_c.moveTo(_angle);
-  while (stepper_c.run()) {
-    //No op
-  }
-  setRunningSpeed_c();
 }
 
 // Actual rotation function, in steps, relative for moteur pivot

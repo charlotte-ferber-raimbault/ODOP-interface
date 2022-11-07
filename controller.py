@@ -166,15 +166,17 @@ class ODOP (Controller):
         :param value: angular displacement
         :return: success_bool, success_msg
         """
+        new_angle = self.get_angle('x') + value
+        nb_steps = round(value*steps_per_deg/360) # to send a command in steps to the motor
 
-        if value >= X_ANGLE_MIN and value <= X_ANGLE_MAX:
+        if new_angle >= X_ANGLE_MIN and new_angle <= X_ANGLE_MAX:
             
             # Log movement
-            self.set_angle('x', value)
+            self.set_angle('x', new_angle)
 
             # Execute command
             val = self.execute (
-                command=f'rotate_p {float(value)}', #il faut convertir value en nombre de pas
+                command=f'rotate_p {float(nb_steps)}',
                 time_window=min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX),  # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
                 readback=f'rotate_p : success'
             )
@@ -196,13 +198,17 @@ class ODOP (Controller):
         :param value: angular displacement
         :return: success_bool, success_msg
         """
-        if value >= Y_ANGLE_MIN and value <= Y_ANGLE_MAX:
+        new_angle = self.get_angle('y') + value
+        motor_angle = value*belt_to_motor # because angle of the motor is different from angle of the belt
+        nb_steps = round(motor_angle*steps_per_deg/360) # to send a command in steps to the motor
+
+        if new_angle >= Y_ANGLE_MIN and new_angle <= Y_ANGLE_MAX:
             # Log movement
-            self.set_angle('y', value)
+            self.set_angle('y', new_angle)
 
             # Execute command
             val = self.execute (
-                command=f'rotate_c {float(value)}', #il faut convertir value en degrés du moteur puis en nombre de pas
+                command=f'rotate_c {float(nb_steps)}',
                 time_window=min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX),  # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
                 readback=f'rotate_c : success'
             )
