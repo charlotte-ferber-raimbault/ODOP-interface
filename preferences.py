@@ -4,7 +4,7 @@ SESSION_PATH = "c:\\tmp\\"
 FILENAME_TEMPLATE = "odop-vI{}-vA{}-hI{}-hA{}.jpg"
 
 # Serial settings
-PORT = '/dev/cu.usbmodem101'  # 'COM5'
+PORT = 'COM6'  # 'COM5'
 BAUD_RATE = 9600
 READY_MSG = 'Controller ready'  # Program waits for this message
 

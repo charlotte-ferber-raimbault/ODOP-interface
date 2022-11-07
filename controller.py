@@ -167,7 +167,7 @@ class ODOP (Controller):
         :return: success_bool, success_msg
         """
         new_angle = self.get_angle('x') + value
-        nb_steps = round(value*steps_per_deg/360) # to send a command in steps to the motor
+        nb_steps = round(value*steps_per_deg) # to send a command in steps to the motor
 
         if new_angle >= X_ANGLE_MIN and new_angle <= X_ANGLE_MAX:
             
@@ -177,14 +177,14 @@ class ODOP (Controller):
             # Execute command
             val = self.execute (
                 command=f'rotate_p {float(nb_steps)}',
-                time_window=min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX),  # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
+                time_window=TIME_WINDOW_MAX, #min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
                 readback=f'rotate_p : success'
             )
             
             # Process output
             if   val == 0:
                 # Inform user
-                print('Successfully moved')
+                print(f'Successfully moved to {self.get_angle("x")}')
                 return True, ''
             else:          
                 return False, 'timeout'
@@ -200,7 +200,7 @@ class ODOP (Controller):
         """
         new_angle = self.get_angle('y') + value
         motor_angle = value*belt_to_motor # because angle of the motor is different from angle of the belt
-        nb_steps = round(motor_angle*steps_per_deg/360) # to send a command in steps to the motor
+        nb_steps = round(motor_angle*steps_per_deg) # to send a command in steps to the motor
 
         if new_angle >= Y_ANGLE_MIN and new_angle <= Y_ANGLE_MAX:
             # Log movement
@@ -209,14 +209,14 @@ class ODOP (Controller):
             # Execute command
             val = self.execute (
                 command=f'rotate_c {float(nb_steps)}',
-                time_window=min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX),  # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
+                time_window=TIME_WINDOW_MAX, #min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX) # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
                 readback=f'rotate_c : success'
             )
 
             # Process output
             if   val == 0:
                 # Inform user
-                print('Successfully moved')
+                print(f'Successfully moved to {self.get_angle("y")}')
                 return True, ''
             else:          
                 return False, 'timeout'
