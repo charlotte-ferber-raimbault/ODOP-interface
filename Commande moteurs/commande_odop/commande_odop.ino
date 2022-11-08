@@ -13,13 +13,13 @@
 
 #define BAUD_RATE 9600
 
-#define MAX_SPEED_P 100  // à adapter
-#define ACCELERATION_P 50 // à adapter
-#define SPEED_P 100
+#define MAX_SPEED_P 70  // à adapter
+#define ACCELERATION_P 30 // à adapter
+#define SPEED_P 70
 
-#define MAX_SPEED_C 500  // à adapter
+#define MAX_SPEED_C 100  // à adapter
 #define ACCELERATION_C 100 // à adapter
-#define SPEED_C 500
+#define SPEED_C 200
 
 #define ANGLE_RANGE  17.7777777778f //nombre de pas par degré (microstep 1/32e de pas)
 

@@ -27,7 +27,7 @@ class Composition:
         if STATUS_VERBOSE: print('Run success\n')
         return True, ''
 
-    def group_pictures (self, liste: list) -> tuple:
+    def group_pictures (self, liste : list) -> tuple:
         """
         Run group pictures
         :param liste: list of the positions
@@ -43,7 +43,7 @@ class Composition:
         filename = 'group_pictures.csv'
 
         if STATUS_VERBOSE: print('\nStarting run')    
-
+        print(liste)
         for i in range(len(liste)):            
             self.odop.move_absolute_c(liste[i][1])
             self.odop.move_absolute_p(liste[i][0])
@@ -75,7 +75,7 @@ class Composition:
         fields = ['Order', 'Pivot angle', 'Belt angle']
 
         # blank list of rows
-        rows = []
+        rows = [[0, 0., 0.]] # Picture taken at (0., 0.)
 
         # name of the cv file
         filename = 'automatic_pictures.csv'

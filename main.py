@@ -12,7 +12,7 @@ from maillage import *
 
 
 
-    
+
 '''# Initialise camera
     camera = Camera()
     while not camera.ready():
@@ -59,7 +59,7 @@ if __name__ == '__main__':
             if not success: raise InterruptedError(f'run failure - {msg}')
 
         elif mode == 'automatic_pictures':
-            nb_pictures = type_input('Enter the numbre of pictures\n>', int)
+            nb_pictures = type_input('Enter the number of pictures\n>', int)
             success, msg = composition.automatic_pictures(nb_pictures)
             if not success: raise InterruptedError(f'run failure - {msg}')
             '''
