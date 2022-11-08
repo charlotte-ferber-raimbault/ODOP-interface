@@ -27,10 +27,10 @@ class Composition:
         if STATUS_VERBOSE: print('Run success\n')
         return True, ''
 
-    def group_pictures (self, list: list) -> tuple:
+    def group_pictures (self, liste: list) -> tuple:
         """
         Run group pictures
-        :param list: list pf the positions
+        :param liste: list of the positions
         :return: success_bool, success_msg
         """
         # field names
@@ -44,11 +44,11 @@ class Composition:
 
         if STATUS_VERBOSE: print('\nStarting run')    
 
-        for i in range(len(list)):            
-            self.odop.move_absolute_c(list[i][1])
-            self.odop.move_absolute_p(list[i][0])
+        for i in range(len(liste)):            
+            self.odop.move_absolute_c(liste[i][1])
+            self.odop.move_absolute_p(liste[i][0])
             self.odop.take_picture()
-            rows.append([i, list[i][0], list[i][1]])
+            rows.append([i, liste[i][0], liste[i][1]])
 
         # creating the file
         with open(filename, 'w') as csvfile:
