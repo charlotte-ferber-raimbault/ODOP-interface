@@ -1,3 +1,5 @@
+# Copyright (C) 2022 Mines Paris (PSL Research University). All rights reserved.
+
 import time
 import csv
 
@@ -10,20 +12,6 @@ from preferences import *
 from maillage import *
 
 
-
-
-
-'''# Initialise camera
-    camera = Camera()
-    while not camera.ready():
-        time.sleep(0.1)
-        camera.update_status()'''
-
-
-
-'''# Calibrate ODOP
-    odop.calibrate()'''
-
 if __name__ == '__main__':
 
     # Initialise ODOP
@@ -31,7 +19,7 @@ if __name__ == '__main__':
     while not odop.ready():
         time.sleep(0.1)
 
-    while True: #condition d'arrêt si problème à rajouter ?
+    while True:
 
         # Create composition
         composition = Composition (odop=odop)
@@ -62,19 +50,6 @@ if __name__ == '__main__':
             nb_pictures = type_input('Enter the number of pictures\n>', int)
             success, msg = composition.automatic_pictures(nb_pictures)
             if not success: raise InterruptedError(f'run failure - {msg}')
-            '''
-            #à modifier
-            while True:
-
-                vertical_shots_nb   = type_input('Enter the number of vertical shots\n> ', int)
-                horizontal_shots_nb = type_input('Enter the number of horizontal shots\n> ', int)
-
-
-                input(f'\nComposition initialised. Press any key to begin run.\n{RUN_MESSAGE}')
-
-                # Run composer
-                success, msg = composition.automatic_pictures(nb_samples)
-                if not success: raise InterruptedError(f'run failure - {msg}')'''
 
         else:
             print('Error, invalid input')

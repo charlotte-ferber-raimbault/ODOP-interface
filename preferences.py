@@ -1,5 +1,6 @@
+# Copyright (C) 2022 Mines Paris (PSL Research University). All rights reserved.
+
 # Program settings
-#à comprendre
 SESSION_PATH = "c:\\tmp\\"
 FILENAME_TEMPLATE = "odop-vI{}-vA{}-hI{}-hA{}.jpg"
 
@@ -24,7 +25,6 @@ DELAY_BEFORE_SHOT = 1.
 DELAY_AFTER_SHOT = 1.5
 
 # Verbose 
-#à comprendre
 DEBUG_VERBOSE = False
 STATUS_VERBOSE = True
 RUN_MESSAGE = 'Make sure to remove all calibration wires before starting run.'

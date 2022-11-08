@@ -1,3 +1,5 @@
+# Copyright (C) 2022 Mines Paris (PSL Research University). All rights reserved.
+
 import csv
 
 from controller import ODOP
@@ -33,13 +35,13 @@ class Composition:
         :param liste: list of the positions
         :return: success_bool, success_msg
         """
-        # field names
+        # Field names
         fields = ['Order', 'Pivot angle', 'Belt angle']
 
-        # blank list of rows
+        # Blank list of rows
         rows = []
 
-        # name of the cv file
+        # Name of the cv file
         filename = 'group_pictures.csv'
 
         if STATUS_VERBOSE: print('\nStarting run')    
@@ -50,7 +52,7 @@ class Composition:
             self.odop.take_picture()
             rows.append([i, liste[i][0], liste[i][1]])
 
-        # creating the file
+        # Creating the file
         with open(filename, 'w') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter = ',')
             csvwriter.writerow(fields)
@@ -71,13 +73,13 @@ class Composition:
         :param nb_samples: number of pictures
         :return: success_bool, success_msg
         """
-        # field names
+        # Field names
         fields = ['Order', 'Pivot angle', 'Belt angle']
 
-        # blank list of rows
+        # Blank list of rows
         rows = [[0, 0., 0.]] # Picture taken at (0., 0.)
 
-        # name of the cv file
+        # Name of the cv file
         filename = 'automatic_pictures.csv'
 
         if STATUS_VERBOSE: print('\nStarting run')
@@ -102,10 +104,10 @@ class Composition:
             self.odop.take_picture()
             rows.append([i, M[i][0], M[i][1]])
             if M[i][0] != y_angle:
-                self.odop.move_relative_p(-self.odop.get_angle('x')) # the pivot does one revolution as a maximum
+                self.odop.move_relative_p(-self.odop.get_angle('x')) # The pivot does one revolution as a maximum
                 y_angle = M[i][0]
         
-        # creating the file
+        # Creating the file
         with open(filename, 'w') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter = ',')
             csvwriter.writerow(fields)

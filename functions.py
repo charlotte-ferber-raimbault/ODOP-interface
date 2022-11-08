@@ -1,3 +1,4 @@
+# Copyright (C) 2022 Mines Paris (PSL Research University). All rights reserved.
 
 def type_input (message: str, type_, max_iter: int = 10):
     """

@@ -1,3 +1,5 @@
+# Copyright (C) 2022 Mines Paris (PSL Research University). All rights reserved.
+
 import serial  # pip install pyserial
 import time
 
@@ -48,7 +50,6 @@ class Controller:
         self.controller .write(bytes(command, 'utf-8'))
         time.sleep(0.05)
 
-    #à modifier, sûrement simplifier
         # Process readback
         time_start = time.time()  # in seconds
         if DEBUG_VERBOSE: print(f'{int(time_start)} - waiting till {int(time_start + time_window)} ({time_window} seconds)')
@@ -94,70 +95,6 @@ class ODOP (Controller):
         if axis not in ('x', 'y'): return None
         self.__angles [axis] = val
 
-
-    '''# Calibration
-    def estimate_zero (self) -> tuple:
-        """
-        Move to minimum position and then back up to +25
-        :return: success_bool, success_msg
-        """
-
-        # Move to bottom of range
-        val = self.execute (
-            command=f'move_rel x -200',
-            time_window=TIME_WINDOW_MAX,
-            readback='move_rel x: limit reached'
-        )
-        if val != 0: return False, 'unable to reach minimum'  # Exit if didn't find end stop
-
-        # Move up to estimate zero position
-        success, msg = self.move_relative ('x', 25)
-        return success, msg
-
-    
-    def adjust_position (self, axis: str, exit_cmd: str = 'go', time_window = 600.):
-        """
-        Enable manual angular position adjustment of specified axis
-        :param axis: axis
-        :param exit_cmd: command to exit read loop
-        :param time_window: timeout
-        :return: success_bool, success_msg
-        """
-
-        # Information
-        print(f'\nInput relative adjustments for {axis}-axis (in deg). Type \'{exit_cmd}\' to validate.')
-
-        time_now = time.time()
-        while True:
-            # Check timeout
-            if time.time() > time_now + time_window: return False, 'timeout'
-
-            # Read command
-            command = input('> ')
-            if command == exit_cmd: return True, ''
-
-            # Execute command
-            try: self.move_relative(axis, float(command))
-            except ValueError: continue'''
-
-
-    '''def set_zero (self) -> bool:
-        val = self.execute (command='set_zero', time_window=2., readback='set_zero: success')
-        return val == 0
-
-
-    def calibrate (self):
-        """
-        Calibrate ODOP
-        """
-        if STATUS_VERBOSE: print('\nCalibrating ODOP')
-        success, msg = self.estimate_zero()
-        if not success: raise InterruptedError(f'estimate_zero failure - {msg}')
-        success, msg = self.adjust_position('x')
-        if not success: raise InterruptedError(f'manual calibration failure - {msg}')
-        self.set_zero()'''
-
-
     # Motion
     def move_relative_p (self, value: float) -> tuple:
         """
@@ -167,7 +104,7 @@ class ODOP (Controller):
         :return: success_bool, success_msg
         """
         new_angle = self.get_angle('x') + value
-        nb_steps = round(value*steps_per_deg) # to send a command in steps to the motor
+        nb_steps = round(value*steps_per_deg) # To send a command in steps to the motor
 
         if new_angle >= X_ANGLE_MIN and new_angle <= X_ANGLE_MAX:
             
@@ -177,7 +114,7 @@ class ODOP (Controller):
             # Execute command
             val = self.execute (
                 command=f'rotate_p {float(nb_steps)}',
-                time_window=TIME_WINDOW_MAX, #min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
+                time_window=TIME_WINDOW_MAX,
                 readback=f'rotate_p : success'
             )
             
@@ -199,8 +136,8 @@ class ODOP (Controller):
         :return: success_bool, success_msg
         """
         new_angle = self.get_angle('y') + value
-        motor_angle = value*belt_to_motor # because angle of the motor is different from angle of the belt
-        nb_steps = round(motor_angle*steps_per_deg) # to send a command in steps to the motor
+        motor_angle = value*belt_to_motor # Because the angle of the motor is different from the angle of the belt
+        nb_steps = round(motor_angle*steps_per_deg) # To send a command in steps to the motor
 
         if new_angle >= Y_ANGLE_MIN and new_angle <= Y_ANGLE_MAX:
             # Log movement
@@ -209,7 +146,7 @@ class ODOP (Controller):
             # Execute command
             val = self.execute (
                 command=f'rotate_c {float(nb_steps)}',
-                time_window=TIME_WINDOW_MAX, #min(max(abs(2*value), TIME_WINDOW_MIN), TIME_WINDOW_MAX) # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
+                time_window=TIME_WINDOW_MAX,
                 readback=f'rotate_c : success'
             )
 
@@ -262,7 +199,7 @@ class ODOP (Controller):
         # Execute command
         val = self.execute (
             command=f'take_picture',
-            time_window=min(max(abs(2), TIME_WINDOW_MIN), TIME_WINDOW_MAX), #à modifier # TIME_WINDOW_MIN <= time_window <= TIME_WINDOW_MAX
+            time_window=TIME_WINDOW_MAX,
             readback=f'take_picture : success'
         )
 
