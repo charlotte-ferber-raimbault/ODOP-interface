@@ -30,6 +30,7 @@ STATUS_VERBOSE = True
 RUN_MESSAGE = 'Make sure to remove all calibration wires before starting run.'
 
 
-steps_per_deg = 200*32/360 # Number of steps per degree 
+steps_per_deg_p = 200*16/360 # Number of steps per degree 
+steps_per_deg_c = 200/360 # Number of steps per degree 
 
 belt_to_motor = 453/35.015 # Inverse of reduction ratio between motor and belt

@@ -93,7 +93,7 @@ class Composition:
             self.odop.move_absolute_c(0.)
         
         # For the position (0, 0)
-        self.odop.take_picture()
+        #self.odop.take_picture()
 
         y_angle = 0
 
@@ -101,7 +101,7 @@ class Composition:
         for i in range(1, len(M)):            
             self.odop.move_relative_c(M[i][0] - M[i - 1][0])
             self.odop.move_relative_p(M[i][1] - M[i - 1][1])
-            self.odop.take_picture()
+            #self.odop.take_picture()
             rows.append([i, M[i][0], M[i][1]])
             if M[i][0] != y_angle:
                 self.odop.move_relative_p(-self.odop.get_angle('x')) # The pivot does one revolution as a maximum

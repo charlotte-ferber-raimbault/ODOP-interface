@@ -104,7 +104,7 @@ class ODOP (Controller):
         :return: success_bool, success_msg
         """
         new_angle = self.get_angle('x') + value
-        nb_steps = round(value*steps_per_deg) # To send a command in steps to the motor
+        nb_steps = round(value*steps_per_deg_p) # To send a command in steps to the motor
 
         if new_angle >= X_ANGLE_MIN and new_angle <= X_ANGLE_MAX:
             
@@ -137,7 +137,7 @@ class ODOP (Controller):
         """
         new_angle = self.get_angle('y') + value
         motor_angle = value*belt_to_motor # Because the angle of the motor is different from the angle of the belt
-        nb_steps = round(motor_angle*steps_per_deg) # To send a command in steps to the motor
+        nb_steps = round(motor_angle*steps_per_deg_c) # To send a command in steps to the motor
 
         if new_angle >= Y_ANGLE_MIN and new_angle <= Y_ANGLE_MAX:
             # Log movement
